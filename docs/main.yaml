@@ -1,0 +1,30 @@
+openapi: '3.1.1'
+info:
+  title: GBC Library
+  version: '1.0'
+servers:
+  - url: https://{url}
+    variables:
+      url:
+        default: jubilant-doodle-x5g5v6xxq97cppjg-3001.app.github.dev/
+        
+paths:
+  /v1/users/list:
+    get:
+      description: List all users in the GBC Library database
+      responses:
+        '200':
+          description: OK
+
+  /v1/users/get:
+    get:
+      description: Fetch a specific uses in the GBC Library database
+      parameters:
+        - name: id
+          in: query
+          description: ID of user
+          schema:
+            type: number
+      responses:
+        '200':
+          description: OK
