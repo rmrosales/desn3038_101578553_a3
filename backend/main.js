@@ -56,7 +56,7 @@ app.get('/', (request, response) => {
 })
 
 //Getting the top steps january
-app.get("/users/top-steps-january", (request, response) => {
+app.get("/users/topSteps-JAN", (request, response) => {
     pool.query(`
         SELECT u.name, SUM(a.steps_taken) AS total_steps
         FROM ActivityLogs a
@@ -87,7 +87,7 @@ app.get("/users/dailyCal", (request, response) => {
     });
 });
 
-//Users monthly workout
+//Users' monthly workout
 app.get("/users/monthlyWorkout", (request, response) => {
     pool.query(`
         SELECT u.name,
@@ -107,7 +107,7 @@ app.get("/users/monthlyWorkout", (request, response) => {
     });
 });
 
-//Add a new user
+//Adding a new user
 app.post("/users/add", (request, response) => {
     const { name, email, age, gender, password_hash } = request.body;
 
