@@ -1,30 +1,268 @@
 openapi: '3.1.1'
 info:
-  title: GBC Library
+  title: Fitness Client Monitoring App
   version: '1.0'
+  description: API for tracking users' fitness data, including workouts, meals, and activity logs.
 servers:
-  - url: https://{url}
+  - url: https://{url}/
     variables:
       url:
-        default: jubilant-doodle-x5g5v6xxq97cppjg-3001.app.github.dev/
-        
-paths:
-  /v1/users/list:
-    get:
-      description: List all users in the GBC Library database
-      responses:
-        '200':
-          description: OK
+        default: localhost:3001
 
-  /v1/users/get:
+paths:
+  /:
     get:
-      description: Fetch a specific uses in the GBC Library database
-      parameters:
-        - name: id
-          in: query
-          description: ID of user
-          schema:
-            type: number
+      description: Welcome endpoint, returns basic information about the API
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  info:
+                    type: string
+                    example: Fitness Client Monitoring App, set up by Romeo Martin R!
+
+  /users/topSteps-JAN:
+    get:
+      description: Get the top 3 users based on the total number of steps taken in January 2025
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        total_steps:
+                          type: integer
+
+  /users/dailyCal:
+    get:
+      description: Get the daily total calories consumed by users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        date:
+                          type: string
+                          format: date
+                        total_calories:
+                          type: integer
+
+  /users/monthlyWorkout:
+    get:
+      description: Get the total number of workouts and total duration for each user per month
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        month:
+                          type: string
+                        total_workouts:
+                          type: integer
+                        total_minutes:
+                          type: integer
+
+  /users/add:
+    post:
+      description: Add a new user to the database
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - age
+                - gender
+                - password_hash
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                age:
+                  type: integer
+                gender:
+                  type: string
+                  enum: [male, female, other]
+                password_hash:
+                  type: string
+      responses:
+        '200':
+          description: User added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: User added successfully
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      email:
+                        type: string
+        '400':
+          description: Bad Request, missing password_hash
+        '500':
+          description: Internal Server Error
+
+  /workouts/log:
+    post:
+      description: Log a workout for a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+                - date
+                - workout_type
+                - duration
+              properties:
+                user_id:
+                  type: integer
+                date:
+                  type: string
+                  format: date
+                workout_type:
+                  type: string
+                duration:
+                  type: integer
+      responses:
+        '200':
+          description: Workout logged successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Workout logged successfully
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      user_id:
+                        type: integer
+                      date:
+                        type: string
+                      workout_type:
+                        type: string
+                      duration:
+                        type: integer
+        '500':
+          description: Internal Server Error
+
+  /workouts/username/{username}:
+    get:
+      description: Get the workouts logged by a specific user
+      parameters:
+        - name: username
+          in: path
+          required: true
+          description: The username of the user whose workouts are to be retrieved
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        username:
+                          type: string
+                        id:
+                          type: integer
+                        date:
+                          type: string
+                          format: date
+                        workout_type:
+                          type: string
+                        duration:
+                          type: integer
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: No workouts found for user John Doe
+        '500':
+          description: Internal Server Error
